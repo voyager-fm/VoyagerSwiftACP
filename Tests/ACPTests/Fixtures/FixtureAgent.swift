@@ -43,6 +43,8 @@ if scenario == "malformed" {
     _ = FileHandle.standardInput.availableData
     try writeLine(response(id: 1, result: ["protocolVersion": 1, "agentCapabilities": [:]]))
     writeLine("DEFINITELY NOT JSON @@")
+    // wire 오류를 관측하기 전에 processExit가 이기지 않도록 stdin 종료까지 대기한다.
+    while !FileHandle.standardInput.availableData.isEmpty {}
     exit(0)
 }
 

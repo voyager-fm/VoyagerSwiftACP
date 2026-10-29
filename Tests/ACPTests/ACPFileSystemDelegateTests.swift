@@ -75,6 +75,20 @@ final class ACPFileSystemDelegateTests: XCTestCase {
         XCTAssertEqual(response.totalLines, 3)
     }
 
+    /// 개행이 없는 chunk 뒤의 CRLF와 다음 줄을 window에 정확히 반영한다.
+    func testWindowedReadPreservesLineAcrossChunkBoundary() async throws {
+        let firstLine = String(repeating: "a", count: 65535)
+        try "\(firstLine)\r\nbravo\ncharlie".write(to: scratchFile, atomically: true, encoding: .utf8)
+        let response = try await FileSystemDelegate().handleFileReadRequest(
+            scratchFile.path,
+            sessionId: "s1",
+            line: 2,
+            limit: 1,
+        )
+        XCTAssertEqual(response.content, "bravo")
+        XCTAssertEqual(response.totalLines, 3)
+    }
+
     /// An endless character device must terminate within the read cap instead
     /// of blocking the actor forever.
     func testUnboundedDeviceReadIsBounded() async throws {

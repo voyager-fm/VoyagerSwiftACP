@@ -169,9 +169,8 @@ final class ACPConformanceTests: XCTestCase {
     /// Malformed output terminates the connection with a typed failure.
     func testMalformedScenarioIsTypedFailure() async throws {
         let client = try await launchAgent(scenario: "malformed")
-        // The fixture answers initialize, then poisons stdout with a garbage
-        // line and exits. Either initialize itself or the next operation must
-        // observe the typed malformed-frame failure.
+        // fixture는 잘못된 stdout 프레임을 보낸 뒤 클라이언트의 연결 종료까지 살아 있다.
+        // initialize 또는 후속 연산이 typed malformed-frame 실패를 관측해야 한다.
         do {
             _ = try await client.initialize(capabilities: Self.capabilities, timeout: 10)
             _ = try await client.newSession(workingDirectory: "/tmp", timeout: 10)
