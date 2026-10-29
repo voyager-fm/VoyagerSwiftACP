@@ -77,6 +77,8 @@ public actor FileSystemDelegate {
                 wholeFileData.append(chunk)
             }
 
+            // 기존 pending에는 개행이 없으므로 새 chunk에 개행이 있을 때만 누적 버퍼를 탐색한다.
+            guard chunk.contains(0x0A) else { continue }
             while let newlineIndex = pending.firstIndex(of: 0x0A) {
                 let lineData = pending.subdata(in: pending.startIndex ..< newlineIndex)
                 pending.removeSubrange(pending.startIndex ... newlineIndex)
